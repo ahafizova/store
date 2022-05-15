@@ -26,6 +26,7 @@ security = Security(app, user_datastore)
 
 # TODO перевести flash на русский
 
+
 @security.login_context_processor
 def security_login_processor():
     return dict()
@@ -96,6 +97,7 @@ def download_file(name):
     return send_from_directory(app.config["UPLOAD_FOLDER"], name)
 
 
+# TODO починить
 """
 @app.route('/')
 def show_entries():

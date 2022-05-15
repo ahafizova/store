@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Магазин приложений
+{% endblock %}
+
+{% block navbar %}
+    <div class="nav">
+        <a href="{{ url_for_security('login') }}">Вход</a>
+        <a href="{{ url_for_security('register') }}">Регистрация</a>
+    </div>
+{%- endblock navbar %}
+
+{% block content %}
+    <div class="body">
+        Приветствуем
+    </div>
+    <div class="body">
+        в нашем
+    </div>
+    <div class="body">
+        магазине
+    </div>
+    <div class="body">
+        android
+    </div>
+    <div class="body">
+        приложений
+    </div>
+{% endblock %}

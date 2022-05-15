@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Личный кабинет
+{% endblock %}
+
+{% block content %}
+    <div class="body">
+        <h2>Привет {{ email }}!</h2>
+        <p><a href="{{ url_for('upload_file') }}">Загрузить файл</a></p>
+    </div>
+{% endblock %}

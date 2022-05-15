@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% macro render_field_placeholder(field) %}
+    {% if field.label|striptags == 'Email Address' %}
+        <p> {{ field(placeholder='Эл. почта', **kwargs)|safe }} </p>
+    {% endif %}
+
+    {% if field.label|striptags == 'Password' %}
+        <p> {{ field(placeholder='Пароль', **kwargs)|safe }} </p>
+    {% endif %}
+
+    {% if field.label|striptags == 'Retype Password' %}
+        <p> {{ field(placeholder='Повторите пароль', **kwargs)|safe }} </p>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_field_with_errors(field) %}
+    <p>
+        {{ field(**kwargs)|safe }} Запомнить
+        {% if field.errors %}
+            <ul>
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+{% endmacro %}
+
+{% macro render_field(field) %}
+    <p>{{ field(**kwargs)|safe }}</p>
+{% endmacro %}
+
+{% macro render_field_errors(field) %}
+    <p>
+        {% if field and field.errors %}
+            <ul>
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+{% endmacro %}
+
+{% block title %}
+    Авторизация
+{% endblock title %}
+
+{% block navbar %}
+    <div style="margin: -4% -20% 4% 80%;">
+        <a href="{{ url_for_security('register') }}">Регистрация</a>
+    </div>
+{%- endblock navbar %}
+
+{% block content %}
+    <div class="form">
+        <div class="form_msg">
+            {% if login_user_form.email.errors or login_user_form.password.errors %}
+                <p> Неверный логин или пароль </p>
+            {% endif %}
+        </div>
+
+        <h2> Вход </h2>
+
+        <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+            {{ login_user_form.hidden_tag() }}
+            {{ render_field_placeholder(login_user_form.email) }}
+            {{ render_field_placeholder(login_user_form.password) }}
+            {{ render_field_with_errors(login_user_form.remember) }}
+            {{ render_field_errors(login_user_form.csrf_token) }}
+            {{ render_field(login_user_form.submit) }}
+        </form>
+    </div>
+{% endblock %}

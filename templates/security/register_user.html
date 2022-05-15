@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% macro render_field_placeholder(field) %}
+    {% if field.label|striptags == 'Email Address' %}
+        <p> {{ field(placeholder='Эл. почта', **kwargs)|safe }} </p>
+    {% endif %}
+
+    {% if field.label|striptags == 'Password' %}
+        <p> {{ field(placeholder='Пароль', **kwargs)|safe }} </p>
+    {% endif %}
+
+    {% if field.label|striptags == 'Retype Password' %}
+        <p> {{ field(placeholder='Повторите пароль', **kwargs)|safe }} </p>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_field(field) %}
+    <p>{{ field(**kwargs)|safe }}</p>
+{% endmacro %}
+
+{% block title %}
+    Регистрация
+{% endblock title %}
+
+{% block navbar %}
+    <div style="margin: -4% -20% 4% 80%;">
+        <a href="{{ url_for_security('login') }}">Вход</a>
+    </div>
+{%- endblock navbar %}
+
+{% block content %}
+    <div class="form">
+        <div class="form_msg">
+            {% if register_user_form.email.errors %}
+                <p> {{ register_user_form.email.errors }} </p>
+                {# TODO какие еще ошибки? инвалид адресс? Эл. почта уже зарегестрированна? #}
+            {% endif %}
+
+            {% if register_user_form.password.errors %}
+                <p> {{ register_user_form.password.errors }} </p>
+                {# TODO что то еще? длина 8 символов #}
+            {% endif %}
+
+            {% if register_user_form.password_confirm.errors %}
+                <p> {{ register_user_form.password_confirm.errors }} </p>
+                {# TODO что то еще? пароли не совпадают #}
+            {% endif %}
+        </div>
+
+        <h2>Регистрация</h2>
+
+        <form action="{{ url_for_security('register') }}" method="POST" name="register_user_form">
+            {{ register_user_form.hidden_tag() }}
+            {{ render_field_placeholder(register_user_form.email) }}
+            {{ render_field_placeholder(register_user_form.password) }}
+            {% if register_user_form.password_confirm %}
+                {{ render_field_placeholder(register_user_form.password_confirm) }}
+            {% endif %}
+            {{ render_field(register_user_form.submit) }}
+        </form>
+    </div>
+{% endblock %}

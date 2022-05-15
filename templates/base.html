@@ -1,0 +1,52 @@
+{% block doc -%}
+    <!DOCTYPE html>
+    <html{% block html_attribs %}{% endblock html_attribs %}>
+    {%- block html %}
+        <head>
+            <meta charset="UTF-8">
+            <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+
+            <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+            <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
+
+            {%- block head %}
+                <title>{% block title %} {% endblock title %} – APK store</title>
+
+                {%- block metas %}
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                {%- endblock metas %}
+
+                {%- block styles %}
+                {%- endblock styles %}
+            {%- endblock head %}
+        </head>
+
+        <body{% block body_attribs %}{% endblock body_attribs %}>
+
+        <header>
+            <a href="{{ url_for('home') }}" style="text-decoration: none;">
+                <img src="{{ url_for('static', filename='icon.png') }}" width="64" height="64" alt="Home">
+            </a>
+            <span style="font-size: 220%; margin: -20% 0 0 0; font-family: 'Comfortaa', cursive;">
+                Магазин приложений
+            </span>
+            <p></p>
+        </header>
+
+        {% block body -%}
+            {% block navbar %}
+                <div class="nav">
+                    <a href="{{ url_for_security('logout') }}">Выход</a>
+                </div>
+            {%- endblock navbar %}
+
+            {% block content -%}
+            {%- endblock content %}
+
+            {% block scripts %}
+            {%- endblock scripts %}
+        {%- endblock body %}
+        </body>
+    {%- endblock html %}
+    </html>
+{% endblock doc -%}

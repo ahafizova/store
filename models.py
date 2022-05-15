@@ -11,7 +11,7 @@ class EntriesUsers(Base):                       # TODO проверить
     entry_id = Column('entry_id', Integer(), ForeignKey('entry.id'))
 
 
-class Entry(Base, RoleMixin):                   # TODO проверить RoleMixin??
+class Entry(Base):                   # TODO проверить RoleMixin??
     __tablename__ = 'entry'
     id = Column(Integer(), primary_key=True)
     title = Column(String(80), unique=True)

@@ -4,10 +4,11 @@ from flask import Flask, request, render_template, \
 from flask_security import Security, current_user, auth_required, \
      hash_password, SQLAlchemySessionUserDatastore
 from werkzeug.utils import secure_filename
+from sqlalchemy import insert
 
 from config import Config
 from database import db_session, init_db
-from models import User, Role
+from models import User, Role, Entry
 
 ALLOWED_EXTENSIONS = {'txt', 'apk', 'docx'}
 
@@ -23,6 +24,7 @@ app.config['DEBUG'] = True
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 security = Security(app, user_datastore)
 
+# TODO перевести flash на русский
 
 @security.login_context_processor
 def security_login_processor():
@@ -92,6 +94,43 @@ def upload_file():
 @auth_required()
 def download_file(name):
     return send_from_directory(app.config["UPLOAD_FOLDER"], name)
+
+
+"""
+@app.route('/')
+def show_entries():
+
+    search_text = request.args.get('text', default=None, type=str)
+    flag = request.args.get('triggered', default=0, type=int)
+    db = get_db()
+
+    if search_text and search_text.strip() != "":
+        s = '%{}%'.format(search_text)
+        cur = db.execute("select title, text from entries where title like ? or text like ?", (s, s,))
+    else:
+        cur = db.execute('select title, text from entries order by id desc')
+
+    entries = cur.fetchall()
+
+    if not search_text and not flag:
+        return render_template('show_entries.html', entries=entries)
+
+    return json.dumps(dict(result=[dict(r) for r in entries]))
+"""
+
+
+@app.route('/add_entry', methods=['GET', 'POST'])
+def add_entry():
+    if request.method == 'POST':
+        db_session.execute(insert(Entry).values(
+            {
+                Entry.title: request.form["title"],
+                Entry.text: request.form["text"]
+            }))
+        db_session.commit()
+        flash('New entry was successfully posted')
+        return redirect(url_for('home'))
+    return render_template('add_entry.html', error=None)
 
 
 if __name__ == '__main__':

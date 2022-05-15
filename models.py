@@ -1,9 +1,21 @@
 from database import Base
 from flask_security import UserMixin, RoleMixin
-# from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy import Boolean, DateTime, Column, Integer, \
-                       String, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+
+
+class EntriesUsers(Base):                       # TODO проверить
+    __tablename__ = 'entries_users'
+    id = Column(Integer(), primary_key=True)
+    user_id = Column('user_id', Integer(), ForeignKey('user.id'))
+    entry_id = Column('entry_id', Integer(), ForeignKey('entry.id'))
+
+
+class Entry(Base, RoleMixin):                   # TODO проверить RoleMixin??
+    __tablename__ = 'entry'
+    id = Column(Integer(), primary_key=True)
+    title = Column(String(80), unique=True)
+    text = Column(String(255))
 
 
 class RolesUsers(Base):
@@ -24,15 +36,12 @@ class User(Base, UserMixin):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     email = Column(String(255), unique=True)
-    # username = Column(String(255), unique=True, nullable=True)
     password = Column(String(255), nullable=False)
-    # last_login_at = Column(DateTime())
-    # current_login_at = Column(DateTime())
-    # last_login_ip = Column(String(100))
-    # current_login_ip = Column(String(100))
-    # login_count = Column(Integer)
     active = Column(Boolean())
     fs_uniquifier = Column(String(255), unique=True, nullable=False)
-    # confirmed_at = Column(DateTime())
+
+    # TODO если не робит, то попробовать user / users
     roles = relationship('Role', secondary='roles_users',
-                         backref=backref('users', lazy='dynamic'))      # TODO если не робит, то попробовать user
+                         backref=backref('user', lazy='dynamic'))
+    entries = relationship('Entry', secondary='entries_users',
+                           backref=backref('user', lazy='dynamic'))

@@ -5,35 +5,23 @@ from flask_security import Security, current_user, auth_required, \
      hash_password, SQLAlchemySessionUserDatastore
 from werkzeug.utils import secure_filename
 
-import config_app
+from config import Config
 from database import db_session, init_db
 from models import User, Role
 
-UPLOAD_FOLDER = 'file'
 ALLOWED_EXTENSIONS = {'txt', 'apk', 'docx'}
+
+SECURITY_LOGIN_USER_TEMPLATE = 'templates/security/login_user.html'
+SECURITY_REGISTER_USER_TEMPLATE = 'templates/security/register_user.html'
 
 # Create app
 app = Flask(__name__)
+app.config.from_object(Config)
 app.config['DEBUG'] = True
-
-app.config['SECRET_KEY'] = config_app.SECRET_KEY
-app.config['SECURITY_PASSWORD_SALT'] = config_app.SECURITY_PASSWORD_SALT
-app.config['SECURITY_PASSWORD_HASH'] = config_app.SECURITY_PASSWORD_HASH
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 128 * 1000 * 1000     # TODO изменить размер
-
-app.config['SECURITY_REGISTERABLE'] = True
-app.config['SECURITY_SEND_REGISTER_EMAIL'] = False
-app.config['SECURITY_POST_LOGIN_VIEW'] = '/home'
-app.config['SECURITY_POST_REGISTER_VIEW'] = '/home'
 
 # Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 security = Security(app, user_datastore)
-
-SECURITY_LOGIN_USER_TEMPLATE = 'templates/security/login_user.html'
-SECURITY_REGISTER_USER_TEMPLATE = 'templates/security/register_user.html'
 
 
 @security.login_context_processor
@@ -41,13 +29,25 @@ def security_login_processor():
     return dict()
 
 
+@app.teardown_request
+def remove_session(ex=None):
+    db_session.remove()
+
+
 # Create a user to test with
 @app.before_first_request
 def create_user():
+    admin_email = 'admin@me.com'    # TODO вынести в конфиг
+    admin_password = 'root'
     init_db()
-    if not user_datastore.find_user(email="test@me.com"):
-        user_datastore.create_user(email="test@me.com", password=hash_password("password"))
+    user_datastore.find_or_create_role(name='admin', description='администратор')
+    user_datastore.find_or_create_role(name='user', description='пользователь')
     db_session.commit()
+    if not user_datastore.find_user(email=admin_email):
+        user_datastore.create_user(email=admin_email, password=hash_password(admin_password))
+        db_session.commit()
+        user_datastore.add_role_to_user(user_datastore.find_user(email=admin_email), 'admin')
+        db_session.commit()
 
 
 # Views

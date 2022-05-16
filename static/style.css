@@ -15,7 +15,7 @@
     background: #ffc183;
 }
 
-.body {
+.test {
     width: 70%;
     padding: 10px;
     margin: 2% auto;
@@ -33,4 +33,61 @@
 
 .nav {
     margin: -4% -20% 4% 80%;
+}
+
+.frame {
+    margin: 2em auto;
+    width: 50em;
+    padding: 0.8em;
+    background: white;
+}
+
+.flash {
+    background: #cee5F5;
+    padding: 0.5em;
+    border: 1px solid #4B0082;
+}
+
+.search {
+    text-align: left;
+    font-size: 0.8em;
+    padding: 0.3em;
+    margin-bottom: 1em;
+    background: #eee; }
+
+.add-entry {
+    font-size: 0.9em;
+    border-bottom: 1px solid #ccc;
+}
+.add-entry dl {
+    font-weight: bold;
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+.add-entry dt {
+    float: left;
+    width: 20%;
+    padding: 0;
+    padding: 5px 0px 0px 0px;
+    margin: 0;
+}
+.add-entry dd {
+    float: left;
+    width: 80%;
+    padding: 5px 0px 0px 0px;
+    margin: 0;
+}
+
+.entries {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.entries li {
+    margin: 0.8em 1.2em;
+}
+.entries li h2 {
+    margin-left: -0.6em;
 }

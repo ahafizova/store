@@ -1,10 +1,12 @@
 import os
+import json
+
 from flask import Flask, request, render_template, \
      flash, redirect, url_for, send_from_directory
 from flask_security import Security, current_user, auth_required, \
      hash_password, SQLAlchemySessionUserDatastore
 from werkzeug.utils import secure_filename
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 
 from config import Config
 from database import db_session, init_db
@@ -54,7 +56,7 @@ def create_user():
 
 
 # Views
-@app.route('/')
+@app.route('/store')
 def index():
     return render_template('index.html')
 
@@ -98,27 +100,26 @@ def download_file(name):
 
 
 # TODO починить
-"""
 @app.route('/')
 def show_entries():
-
     search_text = request.args.get('text', default=None, type=str)
     flag = request.args.get('triggered', default=0, type=int)
-    db = get_db()
 
     if search_text and search_text.strip() != "":
         s = '%{}%'.format(search_text)
-        cur = db.execute("select title, text from entries where title like ? or text like ?", (s, s,))
-    else:
-        cur = db.execute('select title, text from entries order by id desc')
+        # cur = db.execute("select title, text from entries where title like ? or text like ?", (s, s,))
+        query_select = select([Entry.title, Entry.text]).where(Entry.title.like(s) | Entry.text.like(s))
+        entries = db_session.execute(query_select).fetchall()
 
-    entries = cur.fetchall()
+    else:
+        # cur = db.execute('select title, text from entries order by id desc')
+        query_select = select([Entry.title, Entry.text]).order_by(Entry.id)
+        entries = db_session.execute(query_select).fetchall()
 
     if not search_text and not flag:
         return render_template('show_entries.html', entries=entries)
 
     return json.dumps(dict(result=[dict(r) for r in entries]))
-"""
 
 
 @app.route('/add_entry', methods=['GET', 'POST'])
@@ -131,7 +132,7 @@ def add_entry():
             }))
         db_session.commit()
         flash('New entry was successfully posted')
-        return redirect(url_for('home'))
+        return redirect(url_for('show_entries'))
     return render_template('add_entry.html', error=None)
 
 

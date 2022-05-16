@@ -1,52 +1,54 @@
-{% block doc -%}
-    <!DOCTYPE html>
-    <html{% block html_attribs %}{% endblock html_attribs %}>
-    {%- block html %}
-        <head>
-            <meta charset="UTF-8">
-            <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="ru">
 
-            <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-            <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-            {%- block head %}
-                <title>{% block title %} {% endblock title %} – APK store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 
-                {%- block metas %}
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                {%- endblock metas %}
+    <script type=text/javascript src="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='jquery.validate.min.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='flash-script.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='form-validation.js') }}"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='search-script.js') }}"></script>
 
-                {%- block styles %}
-                {%- endblock styles %}
-            {%- endblock head %}
-        </head>
+    <title>{% block title %} Магазин {% endblock title %} – APK store</title>
+</head>
 
-        <body{% block body_attribs %}{% endblock body_attribs %}>
+<body>
 
-        <header>
-            <a href="{{ url_for('home') }}" style="text-decoration: none;">
-                <img src="{{ url_for('static', filename='icon.png') }}" width="64" height="64" alt="Home">
-            </a>
-            <span style="font-size: 220%; margin: -20% 0 0 0; font-family: 'Comfortaa', cursive;">
-                Магазин приложений
-            </span>
-            <p></p>
-        </header>
+<header>
+    <a href="{{ url_for('home') }}" style="text-decoration: none;">
+        <img src="{{ url_for('static', filename='icon.png') }}" width="64" height="64" alt="Home">
+    </a>
+    <span style="font-size: 220%; margin: -20% 0 0 0; font-family: 'Comfortaa', cursive;">
+        Магазин приложений
+    </span>
+    <p></p>
+</header>
 
-        {% block body -%}
-            {% block navbar %}
-                <div class="nav">
-                    <a href="{{ url_for_security('logout') }}">Выход</a>
-                </div>
-            {%- endblock navbar %}
+{% block body -%}
+    {% block navbar %}
+        <div class="nav">
+            <a href="{{ url_for_security('logout') }}">Выход</a>
+        </div>
+    {%- endblock navbar %}
 
-            {% block content -%}
-            {%- endblock content %}
+    <div class=frame>
+        {% for message in get_flashed_messages() %}
+            <div class=flash>{{ message }}</div>
+        {% endfor %}
+        {% block content -%}
+        {%- endblock content %}
+    </div>
 
-            {% block scripts %}
-            {%- endblock scripts %}
-        {%- endblock body %}
-        </body>
-    {%- endblock html %}
-    </html>
-{% endblock doc -%}
+    {% block scripts %}
+    {%- endblock scripts %}
+{%- endblock body %}
+
+</body>
+
+</html>

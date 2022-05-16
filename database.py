@@ -2,9 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from config import Config
+from config import DATABASE_URL
 
-engine = create_engine(Config.DB_ENGINE_PATH)
+engine = create_engine(DATABASE_URL)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

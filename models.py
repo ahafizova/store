@@ -1,7 +1,8 @@
+from flask_security import RoleMixin, UserMixin
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import backref, relationship
+
 from database import Base
-from flask_security import UserMixin, RoleMixin
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
 
 
 class EntriesUsers(Base):                       # TODO проверить
@@ -12,13 +13,13 @@ class EntriesUsers(Base):                       # TODO проверить
     entry_id = Column('entry_id', Integer(), ForeignKey('entry.id'))
 
 
-class Entry(Base):                   # TODO проверить автоинкремент.  RoleMixin??
+class Entry(Base):                   # TODO проверить автоинкремент
     __tablename__ = 'entry'
 
     id = Column(Integer(), primary_key=True)
     title = Column(String(80), unique=True)
     text = Column(String(255))
-    path = Column(String(255), unique=True)     # TODO норм?
+    path = Column(String(255), unique=True)     # TODO длина норм или можно меньше?
 
     def __repr__(self):
         return f"Entry(id={self.id!r}, title={self.title!r})"

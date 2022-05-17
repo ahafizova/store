@@ -21,7 +21,7 @@ $(document).ready(function(){
             console.log(result[i].title)
             console.log(result[i].text)
 
-            $("#entries").append("<li><a href='/upload/" + result[i].path + "'><h2>" + result[i].title + "</h2></a>" + result[i].text);
+            $("#entries").append("<li><a href='/download/" + result[i].path + "'><h2>" + result[i].title + "</h2></a>" + result[i].text);
 
         }
       },

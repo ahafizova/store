@@ -1,16 +1,30 @@
-import os
 import json
+import os
 
-from flask import Flask, request, render_template, \
-     flash, redirect, url_for, send_from_directory
-from flask_security import Security, current_user, auth_required, \
-     hash_password, SQLAlchemySessionUserDatastore
-from werkzeug.utils import secure_filename
+from flask import (
+    flash,
+    Flask,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
+from flask_security import (
+    auth_required,
+    current_user,
+    hash_password,
+    roles_required,
+    Security,
+    SQLAlchemySessionUserDatastore,
+)
 from sqlalchemy import insert, select
+from werkzeug.utils import secure_filename
+
 
 from config import Config
 from database import db_session, init_db
-from models import User, Role, Entry
+from models import Entry, Role, User
 
 ALLOWED_EXTENSIONS = {'txt', 'apk', 'docx'}
 
@@ -57,48 +71,9 @@ def create_user():
 
 # Views
 @app.route('/store')
+@roles_required('admin')
 def index():
     return render_template('index.html')
-
-
-@app.route('/home')
-@auth_required()
-def home():
-    return render_template('home.html', email=current_user.email)
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-"""
-@app.route('/upload', methods=['GET', 'POST'])
-@auth_required()
-def upload_file():
-    if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('download_file', name=filename))
-    return render_template('upload.html')
-"""
-
-
-@app.route('/upload/<name>')
-@auth_required()
-def download_file(name):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], name)
 
 
 # TODO прикрутить подстраницы
@@ -124,23 +99,18 @@ def show_entries():
     return json.dumps(dict(result=[dict(r) for r in entries]))
 
 
-"""
-@app.route('/add_entry', methods=['GET', 'POST'])
-def add_entry():
-    if request.method == 'POST':
-        db_session.execute(insert(Entry).values(
-            {
-                Entry.title: request.form["title"],
-                Entry.text: request.form["text"]
-            }))
-        db_session.commit()
-        flash('New entry was successfully posted')
-        return redirect(url_for('show_entries'))
-    return render_template('add_entry.html', error=None)
-"""
+@app.route('/home')
+@auth_required()
+def home():
+    return render_template('home.html', email=current_user.email)
 
 
-@app.route('/add_entry', methods=['GET', 'POST'])
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/add', methods=['GET', 'POST'])
 @auth_required()
 def add_entry():
     if request.method == 'POST':
@@ -165,6 +135,49 @@ def add_entry():
             # return redirect(url_for('download_file', name=filename))
             return redirect(url_for('show_entries'))
     return render_template('add_entry.html', error=None)
+
+
+@app.route('/download/<name>')
+@auth_required()
+def download_file(name):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], name)
+
+
+"""
+@app.route('/upload', methods=['GET', 'POST'])
+@auth_required()
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('download_file', name=filename))
+    return render_template('upload.html')
+
+
+@app.route('/add_entry', methods=['GET', 'POST'])
+def add_entry():
+    if request.method == 'POST':
+        db_session.execute(insert(Entry).values(
+            {
+                Entry.title: request.form["title"],
+                Entry.text: request.form["text"]
+            }))
+        db_session.commit()
+        flash('New entry was successfully posted')
+        return redirect(url_for('show_entries'))
+    return render_template('add_entry.html', error=None)
+"""
 
 
 if __name__ == '__main__':

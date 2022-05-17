@@ -1,12 +1,20 @@
 {% extends "base.html" %}
 
+{% block title %}
+    Загрузка файла
+{% endblock %}
+
 {% block content %}
-    <form action="{{ url_for('add_entry') }}" method=post class=add-entry id="add-entry">
+    <h2>Загрузка файла</h2>
+
+    <form action="{{ url_for('add_entry') }}" method=post class=add-entry id="add-entry" enctype=multipart/form-data>
         <dl>
-            <dt>Title:
+            <dt>Название:
             <dd><input type="text" size=30 name="title">
-            <dt>Text:
-            <dd><textarea name="text" rows=5 cols=40></textarea>
+            <dt>Описание:
+            <dd><textarea name="text" rows=5 cols=50></textarea>
+            <dt>Файл:
+            <dd><input type="file" name="file">
             <dd><input type="submit" name="action" value="Share">
         </dl>
     </form>

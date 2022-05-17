@@ -18,6 +18,7 @@ class Entry(Base):                   # TODO проверить автоинкр�
     id = Column(Integer(), primary_key=True)
     title = Column(String(80), unique=True)
     text = Column(String(255))
+    path = Column(String(255), unique=True)     # TODO норм?
 
     def __repr__(self):
         return f"Entry(id={self.id!r}, title={self.title!r})"

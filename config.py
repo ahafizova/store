@@ -1,7 +1,7 @@
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'app.db')
+DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'app_2.db')
 
 
 class Config(object):
@@ -16,5 +16,5 @@ class Config(object):
     SECURITY_POST_REGISTER_VIEW = '/home'
     SECURITY_POST_LOGIN_VIEW = '/home'
 
-    UPLOAD_FOLDER = 'file'
+    UPLOAD_FOLDER = os.path.join(basedir, 'file')
     MAX_CONTENT_LENGTH = 128 * 1000 * 1000      # TODO изменить размер

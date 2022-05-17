@@ -72,6 +72,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+"""
 @app.route('/upload', methods=['GET', 'POST'])
 @auth_required()
 def upload_file():
@@ -91,6 +92,7 @@ def upload_file():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(url_for('download_file', name=filename))
     return render_template('upload.html')
+"""
 
 
 @app.route('/upload/<name>')
@@ -99,7 +101,7 @@ def download_file(name):
     return send_from_directory(app.config["UPLOAD_FOLDER"], name)
 
 
-# TODO починить
+# TODO прикрутить подстраницы
 @app.route('/')
 def show_entries():
     search_text = request.args.get('text', default=None, type=str)
@@ -108,12 +110,12 @@ def show_entries():
     if search_text and search_text.strip() != "":
         s = '%{}%'.format(search_text)
         # cur = db.execute("select title, text from entries where title like ? or text like ?", (s, s,))
-        query_select = select([Entry.title, Entry.text]).where(Entry.title.like(s) | Entry.text.like(s))
+        query_select = select([Entry.title, Entry.text, Entry.path]).where(Entry.title.like(s) | Entry.text.like(s))
         entries = db_session.execute(query_select).fetchall()
 
     else:
         # cur = db.execute('select title, text from entries order by id desc')
-        query_select = select([Entry.title, Entry.text]).order_by(Entry.id)
+        query_select = select([Entry.title, Entry.text, Entry.path]).order_by(Entry.id)
         entries = db_session.execute(query_select).fetchall()
 
     if not search_text and not flag:
@@ -122,6 +124,7 @@ def show_entries():
     return json.dumps(dict(result=[dict(r) for r in entries]))
 
 
+"""
 @app.route('/add_entry', methods=['GET', 'POST'])
 def add_entry():
     if request.method == 'POST':
@@ -133,6 +136,34 @@ def add_entry():
         db_session.commit()
         flash('New entry was successfully posted')
         return redirect(url_for('show_entries'))
+    return render_template('add_entry.html', error=None)
+"""
+
+
+@app.route('/add_entry', methods=['GET', 'POST'])
+@auth_required()
+def add_entry():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')       # TODO зачем?
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('Файл не выбран')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            db_session.execute(insert(Entry).values(
+                {
+                    Entry.title: request.form["title"],
+                    Entry.text: request.form["text"],
+                    Entry.path: filename
+                }))
+            db_session.commit()
+            flash('Приложение успешно опубликованно')
+            # return redirect(url_for('download_file', name=filename))
+            return redirect(url_for('show_entries'))
     return render_template('add_entry.html', error=None)
 
 

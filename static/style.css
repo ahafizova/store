@@ -15,7 +15,13 @@
     background: #ffc183;
 }
 
-/*.nav {}*/
+.nav {
+    float: right;
+    list-style-type: none;
+}
+.nav li {
+    display: inline;
+}
 
 .frame {
     text-align: start;

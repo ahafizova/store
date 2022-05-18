@@ -1,7 +1,7 @@
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'app_2.db')
+DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'app.db?charset=utf8')
 
 
 class Config(object):

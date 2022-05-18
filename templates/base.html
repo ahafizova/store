@@ -31,11 +31,14 @@
 </header>
 
 {% block body -%}
-    <div class="nav">
+    {#    <div class="nav">#}
+    <ul class="nav" id="nav">
         {% block navbar %}
-            <a class="nav" href="{{ url_for_security('logout') }}">Выход</a>
+            <li><a class="nav" href="{{ url_for_security('logout') }}">Выход</a></li>
         {%- endblock navbar %}
-    </div>
+    </ul>
+
+    {#    </div>#}
 
 
     <div class=frame>

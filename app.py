@@ -21,12 +21,12 @@ from flask_security import (
 from sqlalchemy import insert, select
 from werkzeug.utils import secure_filename
 
-
 from config import Config
 from database import db_session, init_db
-from models import Entry, Role, User
+from models import EntriesUsers, Entry, Role, User
 
-ALLOWED_EXTENSIONS = {'txt', 'apk', 'docx'}
+
+ALLOWED_EXTENSIONS = {'apk', 'txt', 'docx'}
 
 SECURITY_LOGIN_USER_TEMPLATE = 'templates/security/login_user.html'
 SECURITY_REGISTER_USER_TEMPLATE = 'templates/security/register_user.html'
@@ -39,8 +39,6 @@ app.config['DEBUG'] = True
 # Setup Flask-Security
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 security = Security(app, user_datastore)
-
-# TODO перевести flash на русский
 
 
 @security.login_context_processor
@@ -56,7 +54,7 @@ def remove_session(ex=None):
 # Create a user to test with
 @app.before_first_request
 def create_user():
-    admin_email = 'admin@me.com'    # TODO вынести в конфиг
+    admin_email = 'admin@me.com'    # TODO вынести в конфиг ?
     admin_password = 'root'
     init_db()
     user_datastore.find_or_create_role(name='admin', description='администратор')
@@ -70,26 +68,18 @@ def create_user():
 
 
 # Views
-@app.route('/store')
-@roles_required('admin')
-def index():
-    return render_template('index.html')
-
-
-# TODO прикрутить подстраницы
-@app.route('/')
+@app.route('/')     # TODO прикрутить подстраницы
 def show_entries():
     search_text = request.args.get('text', default=None, type=str)
     flag = request.args.get('triggered', default=0, type=int)
 
     if search_text and search_text.strip() != "":
-        s = '%{}%'.format(search_text)
-        # cur = db.execute("select title, text from entries where title like ? or text like ?", (s, s,))
-        query_select = select([Entry.title, Entry.text, Entry.path]).where(Entry.title.like(s) | Entry.text.like(s))
+        s = f'%{search_text}%'
+        query_select = select([Entry.title, Entry.text, Entry.path]).where(
+            Entry.title.ilike(s) | Entry.text.ilike(s))
         entries = db_session.execute(query_select).fetchall()
 
     else:
-        # cur = db.execute('select title, text from entries order by id desc')
         query_select = select([Entry.title, Entry.text, Entry.path]).order_by(Entry.id)
         entries = db_session.execute(query_select).fetchall()
 
@@ -115,7 +105,7 @@ def allowed_file(filename):
 def add_entry():
     if request.method == 'POST':
         if 'file' not in request.files:
-            flash('No file part')       # TODO зачем?
+            flash('Ошибка. No file part')       # TODO зачем?
             return redirect(request.url)
         file = request.files['file']
         if file.filename == '':
@@ -124,15 +114,21 @@ def add_entry():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            db_session.execute(insert(Entry).values(
+            new_entry_id = db_session.execute(insert(Entry).values(
                 {
                     Entry.title: request.form["title"],
                     Entry.text: request.form["text"],
                     Entry.path: filename
-                }))
+                })).lastrowid
+            db_session.commit()
+            db_session.execute(insert(EntriesUsers).values(
+                {
+                    EntriesUsers.entry_id: new_entry_id,
+                    EntriesUsers.user_id: current_user.id
+                }
+            ))
             db_session.commit()
             flash('Приложение успешно опубликованно')
-            # return redirect(url_for('download_file', name=filename))
             return redirect(url_for('show_entries'))
     return render_template('add_entry.html', error=None)
 
@@ -141,6 +137,30 @@ def add_entry():
 @auth_required()
 def download_file(name):
     return send_from_directory(app.config["UPLOAD_FOLDER"], name)
+
+
+@app.route('/store')    # TODO добавить настройки для админа
+@auth_required()
+@roles_required('admin')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/edit')     # TODO добавить редактирование названия, описания и файла
+@auth_required()
+def edit_entry():
+    user_entries = db_session.execute(select([EntriesUsers.entry_id]).where(
+        EntriesUsers.user_id == current_user.id)).fetchall()
+    entries = []
+    for i in user_entries:
+        query_select = select([Entry.title, Entry.text, Entry.path]).where(Entry.id == i[0])
+        tmp = db_session.execute(query_select).fetchone()
+        entries.append(tmp)
+    return render_template('edit_entry.html', entries=entries)
+
+
+if __name__ == '__main__':
+    app.run()
 
 
 """
@@ -178,7 +198,3 @@ def add_entry():
         return redirect(url_for('show_entries'))
     return render_template('add_entry.html', error=None)
 """
-
-
-if __name__ == '__main__':
-    app.run()

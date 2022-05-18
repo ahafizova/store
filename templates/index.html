@@ -5,26 +5,10 @@
 {% endblock %}
 
 {% block navbar %}
-    <div class="nav">
-        <a href="{{ url_for_security('login') }}">Вход</a>
-        <a href="{{ url_for_security('register') }}">Регистрация</a>
-    </div>
+    <a href="{{ url_for_security('login') }}">Вход</a>
+    <a href="{{ url_for_security('register') }}">Регистрация</a>
 {%- endblock navbar %}
 
 {% block content %}
-    <div class="test">
-        Приветствуем
-    </div>
-    <div class="test">
-        в нашем
-    </div>
-    <div class="test">
-        магазине
-    </div>
-    <div class="test">
-        android
-    </div>
-    <div class="test">
-        приложений
-    </div>
+    <h1>Привет</h1>
 {% endblock %}

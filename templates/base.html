@@ -31,11 +31,12 @@
 </header>
 
 {% block body -%}
-    {% block navbar %}
-        <div class="nav">
-            <a href="{{ url_for_security('logout') }}">Выход</a>
-        </div>
-    {%- endblock navbar %}
+    <div class="nav">
+        {% block navbar %}
+            <a class="nav" href="{{ url_for_security('logout') }}">Выход</a>
+        {%- endblock navbar %}
+    </div>
+
 
     <div class=frame>
         {% for message in get_flashed_messages() %}

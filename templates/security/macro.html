@@ -1,0 +1,45 @@
+{% macro render_field_placeholder(field) %}
+    {% if field.label|striptags == 'Email Address' %}
+        <p> {{ field(placeholder='Эл. почта', **kwargs)|safe }} </p>
+    {% endif %}
+
+    {% if field.label|striptags == 'Password' %}
+        <p> {{ field(placeholder='Пароль', **kwargs)|safe }} </p>
+    {% endif %}
+
+    {% if field.label|striptags == 'Retype Password' %}
+        <p> {{ field(placeholder='Повторите пароль', **kwargs)|safe }} </p>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_field_with_errors(field) %}
+    <p>
+        {{ field(**kwargs)|safe }} Запомнить
+        {% if field.errors %}
+            <ul>
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+{% endmacro %}
+
+
+{% macro render_field(field) %}
+    <p>{{ field(**kwargs)|safe }}</p>
+{% endmacro %}
+
+
+{% macro render_field_errors(field) %}
+    <p>
+        {% if field and field.errors %}
+            <ul>
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+{% endmacro %}

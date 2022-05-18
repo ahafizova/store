@@ -7,7 +7,7 @@
     background: #fff6db;
 }
 
-.form_msg {
+.msg {
     width: 280px;
     padding: 10px;
     margin: auto;
@@ -15,27 +15,11 @@
     background: #ffc183;
 }
 
-.test {
-    width: 70%;
-    padding: 10px;
-    margin: 2% auto;
-    text-align: start;
-    border-radius: 10px;
-    background: #fff6db;
-}
-
-.flash-msg {
-    margin: 10px;
-    text-align: center;
-    border-radius: 10px;
-    background: #ffc183;
-}
-
-.nav {
-    margin: -4% -20% 4% 80%;
-}
+/*.nav {}*/
 
 .frame {
+    text-align: start;
+
     margin: 2em auto;
     width: 50em;
     padding: 0.8em;
@@ -55,30 +39,7 @@
     margin-bottom: 1em;
     background: #eee; }
 
-.add-entry {
-    font-size: 0.9em;
-    border-bottom: 1px solid #ccc;
-}
-.add-entry dl {
-    font-weight: bold;
-    width: 100%;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-}
-.add-entry dt {
-    float: left;
-    width: 20%;
-    padding: 0;
-    padding: 5px 0px 0px 0px;
-    margin: 0;
-}
-.add-entry dd {
-    float: left;
-    width: 80%;
-    padding: 5px 0px 0px 0px;
-    margin: 0;
-}
+/*.add-entry {}*/
 
 .entries {
     list-style: none;

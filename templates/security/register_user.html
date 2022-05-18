@@ -1,36 +1,17 @@
 {% extends "base.html" %}
-
-{% macro render_field_placeholder(field) %}
-    {% if field.label|striptags == 'Email Address' %}
-        <p> {{ field(placeholder='Эл. почта', **kwargs)|safe }} </p>
-    {% endif %}
-
-    {% if field.label|striptags == 'Password' %}
-        <p> {{ field(placeholder='Пароль', **kwargs)|safe }} </p>
-    {% endif %}
-
-    {% if field.label|striptags == 'Retype Password' %}
-        <p> {{ field(placeholder='Повторите пароль', **kwargs)|safe }} </p>
-    {% endif %}
-{% endmacro %}
-
-{% macro render_field(field) %}
-    <p>{{ field(**kwargs)|safe }}</p>
-{% endmacro %}
+{% from "security/macro.html" import render_field_placeholder, render_field %}
 
 {% block title %}
     Регистрация
 {% endblock title %}
 
 {% block navbar %}
-    <div style="margin: -4% -20% 4% 80%;">
-        <a href="{{ url_for_security('login') }}">Вход</a>
-    </div>
+    <a href="{{ url_for_security('login') }}">Вход</a>
 {%- endblock navbar %}
 
 {% block content %}
     <div class="form">
-        <div class="form_msg">
+        <div class="msg">
             {% if register_user_form.email.errors %}
                 <p> {{ register_user_form.email.errors }} </p>
                 {# TODO какие еще ошибки? инвалид адресс? Эл. почта уже зарегестрированна? #}

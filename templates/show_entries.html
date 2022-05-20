@@ -7,7 +7,8 @@
 {% block content %}
     <div class=search>
         <input type="text" placeholder="Поиск" id="search_input" name="search"/>
-{#        <a href="{{ url_for('add_entry') }}"><img src="/static/add.png" alt="add entry" style="margin: 5px 10px 0px;width:25px;height:25px;border:0;"></a>#}
+        <a href="{{ url_for('add_entry') }}"><img src="/static/add.png" alt="add entry" style=
+                "margin: 5px 10px 0;width:25px;height:25px;border:0;"></a>
     </div>
 
     <ul class=entries id="entries">
@@ -15,7 +16,7 @@
             <li><a href="{{ url_for('download_file', name=entry.path) }}">
                 <h2>{{ entry.title }}</h2></a>{{ entry.text|safe }}
                 {% else %}
-            <li><em>Приложений пока нет...<</em>
+            <li><em>Приложений пока нет...</em>
         {% endfor %}
     </ul>
 {% endblock %}

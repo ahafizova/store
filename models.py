@@ -5,7 +5,7 @@ from sqlalchemy.orm import backref, relationship
 from database import Base
 
 
-class EntriesUsers(Base):                       # TODO проверить
+class EntriesUsers(Base):
     __tablename__ = 'entries_users'
 
     id = Column(Integer(), primary_key=True)
@@ -13,11 +13,11 @@ class EntriesUsers(Base):                       # TODO проверить
     entry_id = Column('entry_id', Integer(), ForeignKey('entry.id'))
 
 
-class Entry(Base):                   # TODO проверить автоинкремент
+class Entry(Base):
     __tablename__ = 'entry'
 
     id = Column(Integer(), primary_key=True)
-    title = Column(String(80), unique=True)
+    title = Column(String(63))
     text = Column(String(255))
     path = Column(String(255), unique=True)     # TODO длина норм или можно меньше?
 
@@ -53,7 +53,6 @@ class User(Base, UserMixin):
     active = Column(Boolean())
     fs_uniquifier = Column(String(255), unique=True, nullable=False)
 
-    # TODO если не робит, то попробовать user / users
     roles = relationship('Role', secondary='roles_users',
                          backref=backref('user', lazy='dynamic'))
     entries = relationship('Entry', secondary='entries_users',

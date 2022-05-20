@@ -25,9 +25,9 @@
 
 .frame {
     text-align: start;
-
+    width: 70%;
+    /*width: 50em;*/
     margin: 2em auto;
-    width: 50em;
     padding: 0.8em;
     background: white;
 }
@@ -40,9 +40,9 @@
 
 .search {
     text-align: left;
-    font-size: 0.8em;
-    padding: 0.3em;
-    margin-bottom: 1em;
+    /*font-size: 0.8em;*/
+    padding: 10px;
+    margin-bottom: 10px;
     background: #eee; }
 
 /*.add-entry {}*/

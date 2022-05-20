@@ -34,10 +34,15 @@
     {#    <div class="nav">#}
     <ul class="nav" id="nav">
         {% block navbar %}
-            <li><a class="nav" href="{{ url_for_security('logout') }}">Выход</a></li>
+            {% if email %}
+                <li>{{ email }}</li>
+                <li><a class="nav" href="{{ url_for_security('logout') }}">Выход</a></li>
+            {% else %}
+                <li><a href="{{ url_for_security('login') }}">Вход</a></li>
+                <li><a href="{{ url_for_security('register') }}">Регистрация</a></li>
+            {% endif %}
         {%- endblock navbar %}
     </ul>
-
     {#    </div>#}
 
 

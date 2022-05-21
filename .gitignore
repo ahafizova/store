@@ -7,3 +7,5 @@ __pycache__/
 
 db/
 file/
+
+scanner/sha256.db

@@ -158,13 +158,6 @@ def download_file(name):
     return send_from_directory(path, name)
 
 
-@app.route('/store')    # TODO добавить настройки для админа
-@auth_required()
-@roles_required('admin')
-def index():
-    return render_template('index.html', email=current_user.email)
-
-
 @app.route('/edit')     # TODO добавить редактирование названия, описания и файла
 @auth_required()
 def edit_entry():
@@ -176,6 +169,13 @@ def edit_entry():
         tmp = db_session.execute(query_select).fetchone()
         entries.append(tmp)
     return render_template('edit_entry.html', entries=entries, email=current_user.email)
+
+
+@app.route('/admin')    # TODO добавить настройки для админа
+@auth_required()
+@roles_required('admin')
+def admin():
+    return render_template('admin.html', email=current_user.email)
 
 
 if __name__ == '__main__':

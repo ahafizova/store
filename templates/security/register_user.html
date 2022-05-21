@@ -1,31 +1,20 @@
 {% extends "base.html" %}
-{% from "security/macro.html" import render_field_placeholder, render_field %}
+{% from "security/macro.html" import render_field_placeholder, render_field, render_field_errors %}
 
 {% block title %}
     Регистрация
 {% endblock title %}
 
 {% block navbar %}
-    <li><a href="{{ url_for_security('login') }}">Вход</a></li>
+    <li><a class="nav" href="{{ url_for_security('login') }}">Вход</a></li>
 {%- endblock navbar %}
 
 {% block content %}
     <div class="form">
         <div class="msg">
-            {% if register_user_form.email.errors %}
-                <p> {{ register_user_form.email.errors }} </p>
-                {# TODO какие еще ошибки? инвалид адресс? Эл. почта уже зарегестрированна? #}
-            {% endif %}
-
-            {% if register_user_form.password.errors %}
-                <p> {{ register_user_form.password.errors }} </p>
-                {# TODO что то еще? длина 8 символов #}
-            {% endif %}
-
-            {% if register_user_form.password_confirm.errors %}
-                <p> {{ register_user_form.password_confirm.errors }} </p>
-                {# TODO что то еще? пароли не совпадают #}
-            {% endif %}
+            {{ render_field_errors(register_user_form.email) }}
+            {{ render_field_errors(register_user_form.password) }}
+            {{ render_field_errors(register_user_form.password_confirm) }}
         </div>
 
         <h2>Регистрация</h2>

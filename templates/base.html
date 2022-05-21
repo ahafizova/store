@@ -21,35 +21,33 @@
 <body>
 
 <header>
-    <a href="{{ url_for('home') }}" style="text-decoration: none;">
+    <a href="{{ url_for('show_entries') }}" style="text-decoration: none;">
         <img src="{{ url_for('static', filename='icon.png') }}" width="64" height="64" alt="Home">
     </a>
     <span style="font-size: 220%; margin: -20% 0 0 0; font-family: 'Comfortaa', cursive;">
         Магазин приложений
     </span>
-    <p></p>
 </header>
 
 {% block body -%}
-    {#    <div class="nav">#}
     <ul class="nav" id="nav">
         {% block navbar %}
             {% if email %}
-                <li>{{ email }}</li>
                 <li><a class="nav" href="{{ url_for_security('logout') }}">Выход</a></li>
+                <li><a class="nav" href="{{ url_for('home') }}"><i>{{ email }}</i></a></li>
             {% else %}
-                <li><a href="{{ url_for_security('login') }}">Вход</a></li>
-                <li><a href="{{ url_for_security('register') }}">Регистрация</a></li>
+                <li><a class="nav" href="{{ url_for_security('login') }}">Вход</a></li>
+                <li><a class="nav" href="{{ url_for_security('register') }}">Регистрация</a></li>
             {% endif %}
+            <p></p>
         {%- endblock navbar %}
     </ul>
-    {#    </div>#}
-
 
     <div class=frame>
         {% for message in get_flashed_messages() %}
             <div class=flash>{{ message }}</div>
         {% endfor %}
+
         {% block content -%}
         {%- endblock content %}
     </div>

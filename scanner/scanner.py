@@ -19,11 +19,11 @@ def creat_database():
         db_session.commit()
 
 
-def file_hash(file_path):    # TODO хеширование файла
+def file_hash(file_path):  # TODO хеширование файла
     print(file_path)
 
 
-def scan(file_path):         # TODO поиск по базе
+def scan(file_path):  # TODO поиск по базе
     file_hash(file_path)
     # SELECT * FROM sha256
     # WHERE sha256.hash LIKE '{file_path}';

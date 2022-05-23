@@ -1,18 +1,13 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Редактирование приложений
+    {{ entry.title }}
 {% endblock %}
 
 {% block content %}
-    <h2>Редактирование приложений</h2>
+    <h2>{{ entry.title }}</h2>
 
-    <ul class=entries id="entries">
-        {% for entry in entries %}
-            <li><a href="{{ url_for('download_file', name=entry.path) }}">
-                <h2>{{ entry.title }}</h2></a>{{ entry.text|safe }}
-                {% else %}
-            <li><em>Приложений пока нет...</em>
-        {% endfor %}
-    </ul>
+    <br><p>{{ entry.text|safe }}</p>
+    <br><p>{{ entry.path|safe }}</p>
+
 {% endblock %}

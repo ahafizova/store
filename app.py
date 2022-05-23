@@ -25,7 +25,6 @@ from config import Config
 from database import db_session, init_db
 from models import EntriesUsers, Entry, Role, User
 
-
 ALLOWED_EXTENSIONS = {'apk', 'txt', 'docx'}
 LENGTH_FOLDER_NAME = 2
 
@@ -54,7 +53,7 @@ def remove_session(ex=None):
 
 @app.before_first_request
 def create_user():
-    admin_email = 'admin@me.com'    # TODO вынести в конфиг ?
+    admin_email = 'admin@me.com'  # TODO вынести в конфиг ?
     admin_password = 'root'
     init_db()
     user_datastore.find_or_create_role(name='admin', description='администратор')
@@ -68,7 +67,7 @@ def create_user():
 
 
 # Views
-@app.route('/')     # TODO прикрутить подстраницы
+@app.route('/')  # TODO прикрутить подстраницы
 def show_entries():
     search_text = request.args.get('text', default=None, type=str)
     flag = request.args.get('triggered', default=0, type=int)
@@ -89,7 +88,7 @@ def show_entries():
         else:
             return render_template('show_entries.html', entries=entries)
 
-    return json.dumps(dict(result=[dict(r) for r in entries]))      # TODO доделать емаил
+    return json.dumps(dict(result=[dict(r) for r in entries]))  # TODO доделать емаил
 
 
 @app.route('/home')
@@ -108,7 +107,7 @@ def allowed_file(filename):
 def add_entry():
     if request.method == 'POST':
         if 'file' not in request.files:
-            flash('Ошибка')                 # TODO зачем?  No file part
+            flash('Ошибка')  # TODO зачем?  No file part
             return redirect(request.url)
 
         file = request.files['file']
@@ -158,20 +157,28 @@ def download_file(name):
     return send_from_directory(path, name)
 
 
-@app.route('/edit')     # TODO добавить редактирование названия, описания и файла
+@app.route('/edit')
 @auth_required()
-def edit_entry():
+def edit():
     user_entries = db_session.execute(select([EntriesUsers.entry_id]).where(
         EntriesUsers.user_id == current_user.id)).fetchall()
     entries = []
     for i in user_entries:
-        query_select = select([Entry.title, Entry.text, Entry.path]).where(Entry.id == i[0])
+        query_select = select([Entry.id, Entry.title, Entry.text, Entry.path]).where(Entry.id == i[0])
         tmp = db_session.execute(query_select).fetchone()
         entries.append(tmp)
-    return render_template('edit_entry.html', entries=entries, email=current_user.email)
+    return render_template('edit.html', entries=entries, email=current_user.email)
 
 
-@app.route('/admin')    # TODO добавить настройки для админа
+@app.route('/edit/<app_id>')  # TODO добавить редактирование названия, описания и файла
+@auth_required()
+def edit_entry(app_id):
+    user_entry = db_session.execute(select([Entry.title, Entry.text, Entry.path]).where(
+        Entry.id == app_id)).fetchone()
+    return render_template('edit_entry.html', entry=user_entry, email=current_user.email)
+
+
+@app.route('/admin')  # TODO добавить настройки для админа
 @auth_required()
 @roles_required('admin')
 def admin():

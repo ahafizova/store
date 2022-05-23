@@ -30,4 +30,4 @@ class Config(object):
     SECURITY_MSG_RETYPE_PASSWORD_MISMATCH = ('Пароли не совпадают', 'error')
 
     UPLOAD_FOLDER = os.path.join(basedir, 'file')
-    MAX_CONTENT_LENGTH = 128 * 1000 * 1000      # TODO изменить размер
+    MAX_CONTENT_LENGTH = 128 * 1000 * 1000  # TODO изменить размер

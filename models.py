@@ -19,7 +19,7 @@ class Entry(Base):
     id = Column(Integer(), primary_key=True)
     title = Column(String(63))
     text = Column(String(255))
-    path = Column(String(255), unique=True)     # TODO длина норм или можно меньше?
+    path = Column(String(255), unique=True)  # TODO длина норм или можно меньше?
 
     def __repr__(self):
         return f"Entry(id={self.id!r}, title={self.title!r})"

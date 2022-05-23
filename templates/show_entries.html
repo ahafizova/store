@@ -9,7 +9,7 @@
         <input type="text" placeholder="Поиск" id="search_input" name="search"/>
         <a href="{{ url_for('add_entry') }}"><img src="/static/add.png" alt="add entry" style=
                 "margin: 5px 10px 0;width:25px;height:25px;border:0;"></a>
-    </div>
+    </div><br>
 
     <ul class=entries id="entries">
         {% for entry in entries %}

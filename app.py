@@ -41,6 +41,11 @@ user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 security = Security(app, user_datastore)
 
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @security.login_context_processor
 def security_login_processor():
     return dict()
@@ -91,15 +96,16 @@ def show_entries():
     return json.dumps(dict(result=[dict(r) for r in entries]))  # TODO доделать емаил
 
 
+@app.route('/download/<name>')
+def download_file(name):
+    path = os.path.join(app.config["UPLOAD_FOLDER"], name[:LENGTH_FOLDER_NAME])
+    return send_from_directory(path, name)
+
+
 @app.route('/home')
 @auth_required()
 def home():
     return render_template('home.html', email=current_user.email)
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -150,13 +156,6 @@ def add_entry():
     return render_template('add_entry.html', error=None, email=current_user.email)
 
 
-@app.route('/download/<name>')
-@auth_required()
-def download_file(name):
-    path = os.path.join(app.config["UPLOAD_FOLDER"], name[:LENGTH_FOLDER_NAME])
-    return send_from_directory(path, name)
-
-
 @app.route('/edit')
 @auth_required()
 def edit():
@@ -173,9 +172,14 @@ def edit():
 @app.route('/edit/<app_id>')  # TODO добавить редактирование названия, описания и файла
 @auth_required()
 def edit_entry(app_id):
-    user_entry = db_session.execute(select([Entry.title, Entry.text, Entry.path]).where(
-        Entry.id == app_id)).fetchone()
-    return render_template('edit_entry.html', entry=user_entry, email=current_user.email)
+    user_entries = db_session.execute(select([EntriesUsers.entry_id]).where(
+        EntriesUsers.user_id == current_user.id)).fetchall()
+    if app_id.isdigit():
+        if (int(app_id), ) in user_entries:
+            entry = db_session.execute(select([Entry.title, Entry.text, Entry.path]).where(
+                Entry.id == app_id)).fetchone()
+            return render_template('edit_entry.html', entry=entry, email=current_user.email)
+    return redirect(url_for('show_entries'))
 
 
 @app.route('/admin')  # TODO добавить настройки для админа

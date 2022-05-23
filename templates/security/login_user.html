@@ -13,12 +13,13 @@
 {% block content %}
     <div class="form">
         <div class="msg">
-            {% if login_user_form.email.errors or login_user_form.password.errors %}
-                <p> Неверный логин или пароль </p>
-            {% endif %}
+            <p></p>
+                {% if login_user_form.email.errors or login_user_form.password.errors %}
+                    <p> Неверный логин или пароль </p>
+                {% endif %}
         </div>
 
-        <h2> Вход </h2>
+        <h2> Вход </h2><br>
 
         <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
             {{ login_user_form.hidden_tag() }}

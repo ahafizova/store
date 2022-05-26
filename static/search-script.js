@@ -19,9 +19,9 @@ $(document).ready(function(){
         for (i=0; i<result.length; i++) {
             console.log(result[i])
             console.log(result[i].title)
-            console.log(result[i].text)
+            console.log(result[i].tagline)
 
-            $("#entries").append("<li><a href='/download/" + result[i].path + "'><h2>" + result[i].title + "</h2></a>" + result[i].text);
+            $("#entries").append("<li><a href='/download/" + result[i].path + "'><h2>" + result[i].title + "</h2></a>" + result[i].tagline);
 
         }
       },

@@ -7,14 +7,16 @@
 {% block content %}
     <div class=search>
         <input type="text" placeholder="Поиск" id="search_input" name="search"/>
-        <a href="{{ url_for('add_entry') }}"><img src="/static/add.png" alt="add entry" style=
-                "margin: 5px 10px 0;width:25px;height:25px;border:0;"></a>
+        <a href="{{ url_for('add_entry') }}">
+            <img src="/static/add.png" alt="add entry" style=
+                    "vertical-align: middle; margin: auto 10px; width:35px; height:35px; border:0;">
+        </a>
     </div><br>
 
     <ul class=entries id="entries">
         {% for entry in entries %}
-            <li><a href="{{ url_for('download_file', name=entry.path) }}">
-                <h2>{{ entry.title }}</h2></a>{{ entry.text|safe }}
+            <li><a href="{{ url_for('show', name=entry.id) }}">
+                <h2>{{ entry.title }}</h2></a>{{ entry.tagline|safe }}
                 {% else %}
             <li><em>Приложений пока нет...</em>
         {% endfor %}

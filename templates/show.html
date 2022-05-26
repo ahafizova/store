@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ entry['title'] }}
+{% endblock %}
+
+{% block content %}
+
+    <h2>
+        <a href="{{ url_for('download_file', name=entry['path']) }}">{{ entry['title'] }}</a>
+    </h2>
+
+    {% if email %}
+        <div style="clear:both"></div>
+        <form action="{{ url_for('show', name=entry['id']) }}" method=post>
+            <div class="rating-area">
+                <input type="radio" id="star-5" name="rating" value="5" onChange="this.form.submit()">
+                <label for="star-5" title="5"></label>
+                <input type="radio" id="star-4" name="rating" value="4" onChange="this.form.submit()">
+                <label for="star-4" title="4"></label>
+                <input type="radio" id="star-3" name="rating" value="3" onChange="this.form.submit()">
+                <label for="star-3" title="3"></label>
+                <input type="radio" id="star-2" name="rating" value="2" onChange="this.form.submit()">
+                <label for="star-2" title="2"></label>
+                <input type="radio" id="star-1" name="rating" value="1" onChange="this.form.submit()">
+                <label for="star-1" title="1"></label>
+            </div>
+        </form>
+        <div style="clear:both"></div>
+        <p style="float: right; margin: 0 20px 0 0 ;">Ваша оценка: {{ user_score }}</p>
+    {% endif %}
+
+    <h2 style="vertical-align: middle;">
+        <img src="/static/star.png" alt="star" style="
+        margin: 0; width:40px; height:40px;">
+        {{ entry['score'] }}
+
+    </h2>
+
+    <p>{{ entry['text']|safe }}</p>
+
+{% endblock %}

@@ -19,7 +19,7 @@ from flask_security import (
     Security,
     SQLAlchemySessionUserDatastore,
 )
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 
 from config import Config
 from database import db_session, init_db
@@ -72,19 +72,19 @@ def create_user():
 
 
 # Views
-@app.route('/')  # TODO прикрутить подстраницы
+@app.route('/')
 def show_entries():
     search_text = request.args.get('text', default=None, type=str)
     flag = request.args.get('triggered', default=0, type=int)
 
     if search_text and search_text.strip() != "":
         s = f'%{search_text}%'
-        query_select = select([Entry.title, Entry.text, Entry.path]).where(
-            Entry.title.ilike(s) | Entry.text.ilike(s))
+        query_select = select([Entry.title, Entry.tagline, Entry.id]).where(
+            Entry.title.ilike(s) | Entry.tagline.ilike(s))
         entries = db_session.execute(query_select).fetchall()
 
     else:
-        query_select = select([Entry.title, Entry.text, Entry.path]).order_by(Entry.id)
+        query_select = select([Entry.title, Entry.tagline, Entry.id]).order_by(Entry.id)
         entries = db_session.execute(query_select).fetchall()
 
     if not search_text and not flag:
@@ -94,6 +94,45 @@ def show_entries():
             return render_template('show_entries.html', entries=entries)
 
     return json.dumps(dict(result=[dict(r) for r in entries]))  # TODO доделать емаил
+
+
+@app.route('/app/<name>', methods=['GET', 'POST'])  # TODO доделать
+def show(name):
+    if request.method == 'POST' and isinstance(current_user, User):
+        if request.form["rating"].isdigit():
+            query_select = select([Entry.score]).where(Entry.id == name)
+            db_response = db_session.execute(query_select).fetchone()
+            score_dict = json.loads(db_response[0])
+            score_dict[f'{current_user.id}'] = int(request.form["rating"])
+            score_str = json.dumps(score_dict)
+            db_session.execute(update(Entry).where(Entry.id == name).values(score=score_str))
+            db_session.commit()
+
+    query_select = select([Entry.id, Entry.title, Entry.text, Entry.path, Entry.score]).where(
+        Entry.id == name)
+    entry = db_session.execute(query_select).fetchone()
+    title = entry.title
+    text = entry.text.replace('\n', '<br>')
+    path = entry.path
+    score_dict = json.loads(entry.score)
+    amount = round((sum(score_dict.values()) / len(score_dict)), 2)
+
+    response = {
+        'id': name,
+        'title': title,
+        'text': text,
+        'path': path,
+        'score': amount,
+    }
+
+    if isinstance(current_user, User):
+        user_score = 0
+        user_id = f'{current_user.id}'
+        if user_id in score_dict.keys():
+            user_score = score_dict[user_id]
+        return render_template('show.html', entry=response, email=current_user.email, user_score=user_score,)
+    else:
+        return render_template('show.html', entry=response)
 
 
 @app.route('/download/<name>')
@@ -136,10 +175,21 @@ def add_entry():
                 os.mkdir(user_path)
             file.save(os.path.join(user_path, filename))
 
+            text = request.form["text"]
+            tagline_list = text[:255]
+            index = []
+            for symbol in ['.', '!', '?', '\n']:
+                result = tagline_list.find(symbol)
+                if result > 0:
+                    index.append(result)
+            tagline = tagline_list[:min(index)+1]
+            print(tagline)
+
             new_entry_id = db_session.execute(insert(Entry).values(
                 {
                     Entry.title: request.form["title"],
-                    Entry.text: request.form["text"],
+                    Entry.text: text,
+                    Entry.tagline: tagline,
                     Entry.path: filename
                 })).lastrowid
             db_session.commit()

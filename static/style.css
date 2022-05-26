@@ -19,6 +19,7 @@
     float: right;
     list-style-type: none;
     padding: 0 10px;
+    margin: 0;
 }
 .nav li {
     display: inline;
@@ -44,7 +45,8 @@
     /*font-size: 0.8em;*/
     padding: 10px;
     margin-bottom: 10px;
-    background: #eee; }
+    background: #eee;
+}
 
 /*.add-entry {}*/
 
@@ -58,4 +60,46 @@
 }
 .entries li h2 {
     margin-left: -0.6em;
+}
+
+.rating-area {
+    overflow: hidden;
+    width: 265px;
+    margin: 0;
+    float: right;
+}
+.rating-area:not(:checked) > input {
+    display: none;
+}
+.rating-area:not(:checked) > label {
+    float: right;
+    width: 42px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 32px;
+    line-height: 32px;
+    color: lightgrey;
+    text-shadow: 1px 1px #bbb;
+}
+.rating-area:not(:checked) > label:before {
+    content: '★';
+}
+.rating-area > input:checked ~ label {
+    color: gold;
+    text-shadow: 1px 1px #c60;
+}
+.rating-area:not(:checked) > label:hover,
+.rating-area:not(:checked) > label:hover ~ label {
+    color: gold;
+}
+.rating-area > input:checked + label:hover,
+.rating-area > input:checked + label:hover ~ label,
+.rating-area > input:checked ~ label:hover,
+.rating-area > input:checked ~ label:hover ~ label,
+.rating-area > label:hover ~ input:checked ~ label {
+    color: gold;
+    text-shadow: 1px 1px goldenrod;
+}
+.rate-area > label:active {
+    position: relative;
 }

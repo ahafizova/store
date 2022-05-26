@@ -9,8 +9,8 @@
 
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry id="add-entry" enctype=multipart/form-data>
         <div>
-            <p><input type="text" name="title" size=52 placeholder="Название" maxlength="80"></p>
-            <p><textarea name="text" rows=6 cols=50 placeholder="Описание" maxlength="255"></textarea></p>
+            <p><input type="text" name="title" size=62 placeholder="Название" maxlength="63"></p>
+            <p><textarea name="text" rows=8 cols=60 placeholder="Описание" maxlength="1023"></textarea></p>
             <p><input type="file" name="file"></p>
             <p><input type="submit" name="action" value="Отправить"></p>
         </div>

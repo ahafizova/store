@@ -1,5 +1,5 @@
 from flask_security import RoleMixin, UserMixin
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import backref, relationship
 
 from database import Base
@@ -18,8 +18,10 @@ class Entry(Base):
 
     id = Column(Integer(), primary_key=True)
     title = Column(String(63))
-    text = Column(String(255))
-    path = Column(String(255), unique=True)  # TODO длина норм или можно меньше?
+    tagline = Column(String(255))
+    text = Column(String(1023))
+    path = Column(String(255), unique=True)  # TODO уменьшить длину?
+    score = Column(Text(), default='{"1": 5}')
 
     def __repr__(self):
         return f"Entry(id={self.id!r}, title={self.title!r})"
@@ -37,7 +39,7 @@ class Role(Base, RoleMixin):
     __tablename__ = 'role'
 
     id = Column(Integer(), primary_key=True)
-    name = Column(String(80), unique=True)
+    name = Column(String(63), unique=True)  # 80
     description = Column(String(255))
 
     def __repr__(self):

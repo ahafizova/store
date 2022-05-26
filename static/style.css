@@ -48,7 +48,14 @@
     background: #eee;
 }
 
-/*.add-entry {}*/
+::-webkit-file-upload-button {
+    padding: 12px 20px;
+    margin: 0;
+}
+
+.add-entry-form {
+    padding: 12px 20px;
+}
 
 .entries {
     list-style: none;

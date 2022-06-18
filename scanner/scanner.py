@@ -9,11 +9,9 @@ def creat_database():
     check = db_session.execute(select_query).fetchone()
     print(check)
     if check is None:
-        with open("full_sha256.txt", "r") as f:
+        with open("ssdeep_hash.txt", "r") as f:
             for line in f:
-                if '#' in line:
-                    continue
-                line = line.strip('\n')
+                line = line.strip('\n "')
                 insert_query = insert(Hash).values({Hash.name: line})
                 db_session.execute(insert_query)
         db_session.commit()

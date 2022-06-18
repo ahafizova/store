@@ -19,7 +19,7 @@ class Entry(Base):
     id = Column(Integer(), primary_key=True)
     title = Column(String(63))
     tagline = Column(String(255))
-    text = Column(String(1023))
+    text = Column(String(4095))
     path = Column(String(255), unique=True)  # TODO уменьшить длину?
     score = Column(Text(), default='{"1": 5}')
 

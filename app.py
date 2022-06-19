@@ -15,6 +15,7 @@ from flask_security import (
     auth_required,
     current_user,
     hash_password,
+    roles_accepted,
     roles_required,
     Security,
     SQLAlchemySessionUserDatastore,
@@ -257,7 +258,7 @@ def add_entry():
 
 @app.route('/edit')
 @auth_required()
-@roles_required('admin', 'developer')
+@roles_accepted('admin', 'developer')
 def edit():
     user_entries = db_session.execute(select([EntriesUsers.entry_id]).where(
         EntriesUsers.user_id == current_user.id)).fetchall()
@@ -271,7 +272,7 @@ def edit():
 
 @app.route('/edit/<app_id>')  # TODO добавить редактирование названия, описания и файла
 @auth_required()
-@roles_required('admin', 'developer')
+@roles_accepted('admin', 'developer')
 def edit_entry(app_id):
     user_entries = db_session.execute(select([EntriesUsers.entry_id]).where(
         EntriesUsers.user_id == current_user.id)).fetchall()

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Регистрация разработчика
+{% endblock %}
+
+{% block content %}
+    <h2>Регистрация разработчика</h2><br>
+
+    <form action="{{ url_for('add_dev') }}" method=post class=add-entry id="add-entry" enctype=multipart/form-data>
+        <div>
+            <p><input type="text" name="title" size=63 placeholder="Имя издателя" maxlength="63"
+                      class="add-entry-form"></p>
+            <p><input type="submit" name="action" value="Отправить" class="add-entry-form"></p>
+        </div>
+    </form>
+{% endblock %}

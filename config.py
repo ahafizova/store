@@ -4,6 +4,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 DATABASE_URL = 'postgresql://postgres:root@localhost/app'
 # DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'app.db?charset=utf8')
 
+ADMIN_EMAIL = 'admin@me.com'
+ADMIN_PASSWORD = 'root'
+
 
 class Config(object):
     SECRET_KEY = 'bHFLqgZMyCxAVD7FrjHlkemObBcTGDINu1bqZC6LQHo'

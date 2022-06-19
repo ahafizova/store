@@ -22,6 +22,7 @@ class Entry(Base):
     text = Column(String(4095))
     path = Column(String(255), unique=True)  # TODO уменьшить длину?
     score = Column(Text(), default='{"1": 5}')
+    download = Column(Integer(), default=0)
 
     def __repr__(self):
         return f"Entry(id={self.id!r}, title={self.title!r})"
@@ -52,6 +53,7 @@ class User(Base, UserMixin):
     id = Column(Integer(), primary_key=True)
     email = Column(String(255), unique=True)
     password = Column(String(255), nullable=False)
+    name = Column(String(127), unique=True)
     active = Column(Boolean())
     fs_uniquifier = Column(String(255), unique=True, nullable=False)
 

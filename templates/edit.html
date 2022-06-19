@@ -10,7 +10,7 @@
     <ul class=entries id="entries">
         {% for entry in entries %}
             <li><a href="{{ url_for('edit_entry', app_id=entry.id) }}">
-                <h2>{{ entry.title }}</h2></a>{{ entry.text|safe }}
+                <h2>{{ entry.title }}</h2></a>
                 {% else %}
             <li><em>Приложений пока нет...</em>
         {% endfor %}

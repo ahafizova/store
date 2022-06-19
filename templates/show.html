@@ -9,6 +9,7 @@
     <h2>
         <a href="{{ url_for('download_file', name=entry['path']) }}">{{ entry['title'] }}</a>
     </h2>
+    <div style="font-style:italic; color:gray">{{ entry['dev'] }}</div>
 
     {% if email %}
         <div style="clear:both"></div>
@@ -34,6 +35,9 @@
         <img src="/static/star.png" alt="star" style="
         margin: 0; width:40px; height:40px;">
         {{ entry['score'] }}
+        <img src="/static/load2.png" alt="star" style="
+        margin: 0; width:40px; height:40px;">
+        {{ entry['download'] }}
 
     </h2>
 

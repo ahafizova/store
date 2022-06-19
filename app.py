@@ -21,11 +21,11 @@ from flask_security import (
 )
 from sqlalchemy import insert, select, update
 
-from config import Config
+from config import ADMIN_EMAIL, ADMIN_PASSWORD, Config
 from database import db_session, init_db
 from models import EntriesUsers, Entry, Role, User
 
-ALLOWED_EXTENSIONS = {'apk', 'txt', 'docx'}
+ALLOWED_EXTENSIONS = {'apk'}
 LENGTH_FOLDER_NAME = 2
 
 SECURITY_LOGIN_USER_TEMPLATE = 'templates/security/login_user.html'
@@ -58,16 +58,21 @@ def remove_session(ex=None):
 
 @app.before_first_request
 def create_user():
-    admin_email = 'admin@me.com'  # TODO вынести в конфиг ?
-    admin_password = 'root'
+    admin_email = ADMIN_EMAIL
+    admin_password = ADMIN_PASSWORD
     init_db()
     user_datastore.find_or_create_role(name='admin', description='администратор')
+    user_datastore.find_or_create_role(name='developer', description='разработчик')
     user_datastore.find_or_create_role(name='user', description='пользователь')
     db_session.commit()
     if not user_datastore.find_user(email=admin_email):
         user_datastore.create_user(email=admin_email, password=hash_password(admin_password))
         db_session.commit()
-        user_datastore.add_role_to_user(user_datastore.find_user(email=admin_email), 'admin')
+
+        admin_id = user_datastore.find_user(email=admin_email)
+        user_datastore.add_role_to_user(admin_id, 'admin')
+        db_session.commit()
+        db_session.execute(update(User).where(User.id == admin_id.id).values(name='admin'))
         db_session.commit()
 
 
@@ -93,10 +98,10 @@ def show_entries():
         else:
             return render_template('show_entries.html', entries=entries)
 
-    return json.dumps(dict(result=[dict(r) for r in entries]))  # TODO доделать емаил
+    return json.dumps(dict(result=[dict(r) for r in entries]))
 
 
-@app.route('/app/<name>', methods=['GET', 'POST'])  # TODO доделать
+@app.route('/app/<name>', methods=['GET', 'POST'])
 def show(name):
     if request.method == 'POST' and isinstance(current_user, User):
         if request.form["rating"].isdigit():
@@ -108,7 +113,7 @@ def show(name):
             db_session.execute(update(Entry).where(Entry.id == name).values(score=score_str))
             db_session.commit()
 
-    query_select = select([Entry.id, Entry.title, Entry.text, Entry.path, Entry.score]).where(
+    query_select = select([Entry.id, Entry.title, Entry.text, Entry.path, Entry.score, Entry.download]).where(
         Entry.id == name)
     entry = db_session.execute(query_select).fetchone()
     title = entry.title
@@ -116,6 +121,10 @@ def show(name):
     path = entry.path
     score_dict = json.loads(entry.score)
     amount = round((sum(score_dict.values()) / len(score_dict)), 2)
+    download = entry.download
+
+    dev_id = db_session.execute(select([EntriesUsers.user_id]).where(EntriesUsers.entry_id == name)).fetchone()[0]
+    dev = db_session.execute(select([User.name]).where(User.id == dev_id)).fetchone()[0]
 
     response = {
         'id': name,
@@ -123,6 +132,8 @@ def show(name):
         'text': text,
         'path': path,
         'score': amount,
+        'download': download,
+        'dev': dev
     }
 
     if isinstance(current_user, User):
@@ -137,6 +148,9 @@ def show(name):
 
 @app.route('/download/<name>')
 def download_file(name):
+    load = db_session.execute(select([Entry.download]).where(Entry.path == name)).fetchone()[0] + 1
+    db_session.execute(update(Entry).where(Entry.path == name).values(download=load))
+    db_session.commit()
     path = os.path.join(app.config["UPLOAD_FOLDER"], name[:LENGTH_FOLDER_NAME])
     return send_from_directory(path, name)
 
@@ -144,12 +158,42 @@ def download_file(name):
 @app.route('/home')
 @auth_required()
 def home():
-    return render_template('home.html', email=current_user.email)
+    if current_user.has_role('admin') or current_user.has_role('developer'):
+        dev = db_session.execute(select([User.name]).where(User.id == current_user.id)).fetchone()[0]
+        return render_template('home.html', email=current_user.email, dev=dev)
+
+    return render_template('home_user.html', email=current_user.email)
+
+
+@app.route('/dev', methods=['GET', 'POST'])     # TODO ограничить доступ по ссылке
+@auth_required()
+def add_dev():
+    if request.method == 'POST':
+        dev_name = (request.form["title"])
+        query_select = select([User.id]).where(User.name == dev_name)
+        check = db_session.execute(query_select).fetchone()
+        if check:
+            flash('Введенное имя уже занято')
+            return redirect(request.url)
+
+        user_datastore.add_role_to_user(current_user, 'developer')
+        db_session.commit()
+        query_update = update(User).where(User.id == current_user.id).values(name=dev_name)
+        db_session.execute(query_update)
+        db_session.commit()
+
+        flash('Вы стали разработчиком')
+        return redirect(url_for('home'))
+
+    return render_template('add_dev.html', email=current_user.email)
 
 
 @app.route('/add', methods=['GET', 'POST'])
-@auth_required()
 def add_entry():
+    if not (current_user.has_role('admin') or current_user.has_role('developer')):
+        flash('Вы не можете загружать приложения, т.к. не являетесь разработчиком')
+        return redirect(url_for('show_entries'))
+
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('Ошибка')  # TODO зачем?  No file part
@@ -176,14 +220,17 @@ def add_entry():
             file.save(os.path.join(user_path, filename))
 
             text = request.form["text"]
-            tagline_list = text[:255]
+            tmp = text + '\n'
+            tagline_list = tmp[:250]
             index = []
             for symbol in ['.', '!', '?', '\n']:
                 result = tagline_list.find(symbol)
                 if result > 0:
                     index.append(result)
-            tagline = tagline_list[:min(index)+1]
-            print(tagline)
+            if len(index) > 0:
+                tagline = tagline_list[:min(index)+1]
+            else:
+                tagline = tagline_list[:100]
 
             new_entry_id = db_session.execute(insert(Entry).values(
                 {
@@ -191,7 +238,9 @@ def add_entry():
                     Entry.text: text,
                     Entry.tagline: tagline,
                     Entry.path: filename
-                })).lastrowid
+                }))
+            new_entry_id = new_entry_id.inserted_primary_key[0]
+            print('new_entry_id \t', new_entry_id)
             db_session.commit()
             db_session.execute(insert(EntriesUsers).values(
                 {
@@ -208,6 +257,7 @@ def add_entry():
 
 @app.route('/edit')
 @auth_required()
+@roles_required('admin', 'developer')
 def edit():
     user_entries = db_session.execute(select([EntriesUsers.entry_id]).where(
         EntriesUsers.user_id == current_user.id)).fetchall()
@@ -221,6 +271,7 @@ def edit():
 
 @app.route('/edit/<app_id>')  # TODO добавить редактирование названия, описания и файла
 @auth_required()
+@roles_required('admin', 'developer')
 def edit_entry(app_id):
     user_entries = db_session.execute(select([EntriesUsers.entry_id]).where(
         EntriesUsers.user_id == current_user.id)).fetchall()

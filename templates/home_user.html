@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Личный кабинет
+{% endblock %}
+
+{% block content %}
+    <div>
+        <h2>Привет {{ email }}!</h2><br>
+
+        <p><a href="{{ url_for('show_entries') }}">Каталог приложений</a></p>
+        <p>Мои оценки</p><br>
+
+        <p><a href="{{ url_for('add_dev') }}">Стать разработчиком!</a></p>
+
+    </div>
+{% endblock %}

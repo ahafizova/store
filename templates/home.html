@@ -6,11 +6,15 @@
 
 {% block content %}
     <div>
-        <h2>Привет {{ email }}!</h2><br>
+        <h2>Привет {{ email }}!</h2>
+        <div style="font-style:italic; color:gray">{{ dev }}</div><br>
 
         <p><a href="{{ url_for('show_entries') }}">Каталог приложений</a></p>
-        <p><a href="{{ url_for('edit') }}">Редактировать свои приложения</a></p>
+        <p>Мои оценки</p>
+        <p></p>
         <p><a href="{{ url_for('add_entry') }}">Загрузить новое приложение</a></p>
+        <p><a href="{{ url_for('edit') }}">Редактировать загруженные приложения</a></p>
+
 
     </div>
 {% endblock %}

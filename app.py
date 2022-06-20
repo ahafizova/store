@@ -85,13 +85,13 @@ def show_entries():
 
     if search_text and search_text.strip() != "":
         s = f'%{search_text}%'
-        query_select = select([Entry.title, Entry.tagline, Entry.id]).where(
+        query = select([Entry.title, Entry.tagline, Entry.id]).where(
             Entry.title.ilike(s) | Entry.tagline.ilike(s))
-        entries = db_session.execute(query_select).fetchall()
+        entries = db_session.execute(query).fetchall()
 
     else:
-        query_select = select([Entry.title, Entry.tagline, Entry.id]).order_by(Entry.id)
-        entries = db_session.execute(query_select).fetchall()
+        query = select([Entry.title, Entry.tagline, Entry.id]).order_by(Entry.id)
+        entries = db_session.execute(query).fetchall()
 
     if not search_text and not flag:
         if isinstance(current_user, User):
@@ -106,17 +106,17 @@ def show_entries():
 def show(name):
     if request.method == 'POST' and isinstance(current_user, User):
         if request.form["rating"].isdigit():
-            query_select = select([Entry.score]).where(Entry.id == name)
-            db_response = db_session.execute(query_select).fetchone()
+            query = select([Entry.score]).where(Entry.id == name)
+            db_response = db_session.execute(query).fetchone()
             score_dict = json.loads(db_response[0])
             score_dict[f'{current_user.id}'] = int(request.form["rating"])
             score_str = json.dumps(score_dict)
             db_session.execute(update(Entry).where(Entry.id == name).values(score=score_str))
             db_session.commit()
 
-    query_select = select([Entry.id, Entry.title, Entry.text, Entry.path, Entry.score, Entry.download]).where(
+    query = select([Entry.id, Entry.title, Entry.text, Entry.path, Entry.score, Entry.download]).where(
         Entry.id == name)
-    entry = db_session.execute(query_select).fetchone()
+    entry = db_session.execute(query).fetchone()
     title = entry.title
     text = entry.text.replace('\n', '<br>')
     path = entry.path
@@ -171,16 +171,16 @@ def home():
 def add_dev():
     if request.method == 'POST':
         dev_name = (request.form["title"])
-        query_select = select([User.id]).where(User.name == dev_name)
-        check = db_session.execute(query_select).fetchone()
+        query = select([User.id]).where(User.name == dev_name)
+        check = db_session.execute(query).fetchone()
         if check:
             flash('Введенное имя уже занято')
             return redirect(request.url)
 
         user_datastore.add_role_to_user(current_user, 'developer')
         db_session.commit()
-        query_update = update(User).where(User.id == current_user.id).values(name=dev_name)
-        db_session.execute(query_update)
+        query = update(User).where(User.id == current_user.id).values(name=dev_name)
+        db_session.execute(query)
         db_session.commit()
 
         flash('Вы стали разработчиком')
@@ -218,7 +218,9 @@ def add_entry():
             user_path = os.path.join(app.config['UPLOAD_FOLDER'], filename[:LENGTH_FOLDER_NAME])
             if not os.path.exists(user_path):
                 os.mkdir(user_path)
-            file.save(os.path.join(user_path, filename))
+            file.save(os.path.join(user_path, filename))    # TODO проверить безопасность файла
+
+
 
             text = request.form["text"]
             tmp = text + '\n'
@@ -264,8 +266,8 @@ def edit():
         EntriesUsers.user_id == current_user.id)).fetchall()
     entries = []
     for i in user_entries:
-        query_select = select([Entry.id, Entry.title, Entry.text, Entry.path]).where(Entry.id == i[0])
-        tmp = db_session.execute(query_select).fetchone()
+        query = select([Entry.id, Entry.title, Entry.text, Entry.path]).where(Entry.id == i[0])
+        tmp = db_session.execute(query).fetchone()
         entries.append(tmp)
     return render_template('edit.html', entries=entries, email=current_user.email)
 

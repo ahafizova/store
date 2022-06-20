@@ -2,8 +2,6 @@ from sqlalchemy import Column, create_engine, Integer, String
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-# basedir = os.path.abspath(os.path.dirname(__file__))
-# DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'sha256.db')
 DATABASE_URL = 'postgresql://postgres:root@localhost/ssdeep'
 
 

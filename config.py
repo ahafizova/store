@@ -1,11 +1,24 @@
 import os
 
+"""-------------------- app.py --------------------"""
+
+"""-------------------- database.py --------------------"""
+
+"""-------------------- models.py --------------------"""
+
+"""-------------------- scanner/scanner.py --------------------"""
+
+"""-------------------- scanner/db.py --------------------"""
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 DATABASE_URL = 'postgresql://postgres:root@localhost/app'
 # DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'app.db?charset=utf8')
 
 ADMIN_EMAIL = 'admin@me.com'
 ADMIN_PASSWORD = 'root'
+
+API_KEY = 'd9da36233f2a6d367fc9c7b1389bfd02a1fcc34e1191a77782f3c43db96cf4ef'
+DB_URL = 'postgresql://postgres:root@localhost/ssdeep'
 
 
 class Config(object):

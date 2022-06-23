@@ -2,10 +2,12 @@ from sqlalchemy import Column, create_engine, Integer, String
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-DATABASE_URL = 'postgresql://postgres:root@localhost/ssdeep'
+from config import DB_URL
+
+# DB_URL = 'postgresql://postgres:root@localhost/ssdeep'
 
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DB_URL)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

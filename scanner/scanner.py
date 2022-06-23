@@ -3,10 +3,15 @@ import time
 
 import requests
 from sqlalchemy import insert, select
+import ssdeep
+# import scanner.ssdeep as ssdeep
 
-from db import db_session, Hash, init_db
+from config import API_KEY
+from scanner.db import db_session, Hash, init_db
+# from db import db_session, Hash, init_db
 
-API_KEY = 'd9da36233f2a6d367fc9c7b1389bfd02a1fcc34e1191a77782f3c43db96cf4ef'
+
+# API_KEY = 'd9da36233f2a6d367fc9c7b1389bfd02a1fcc34e1191a77782f3c43db96cf4ef'
 
 
 def creat_database():
@@ -22,15 +27,17 @@ def creat_database():
         db_session.commit()
 
 
-def scan_database(file_hash):   # TODO доделать сравнение близости
+def scan_database(file_hash, sensitivity=80):
     creat_database()
-    query = select(Hash.id).where(Hash.name == file_hash)
-    result = db_session.execute(query).fetchone()
-    print('\nscan_database \t', result)
-    if result is None:
-        return False
-    else:
-        return True
+    hash_id_list = db_session.execute(select(Hash.id)).fetchall()
+    hash_id_list = [int(i[0]) for i in hash_id_list]
+    for hash_id in hash_id_list:
+        query = select(Hash.name).where(Hash.id == hash_id)
+        db_hash = db_session.execute(query).fetchone()
+        result = ssdeep.compare(file_hash, db_hash)
+        if result >= sensitivity:
+            return True
+    return False
 
 
 def get_file_hash_sha256(file_path):
@@ -51,7 +58,6 @@ def api_find_file(file_sha256):
         "x-apikey": API_KEY
     }
     response = requests.get(url, headers=headers)
-    print('\n------ api_find_file ------\n', response.text)
     response_dict = response.json()
     try:
         return response_dict['data']['attributes']['ssdeep'], response_dict['data']['attributes']['last_analysis_stats']
@@ -67,7 +73,6 @@ def api_upload_file(file_path):
         "x-apikey": API_KEY
     }
     response = requests.post(url, files=files, headers=headers)
-    print('\n------ api_upload_file ------\n', response.text)
     response_dict = response.json()
     try:
         return response_dict['data']['id']
@@ -82,7 +87,6 @@ def api_analyse_file(file_id):
         "x-apikey": API_KEY
     }
     response = requests.get(url, headers=headers)
-    print('\n------ api_analyse_file ------\n', response.text)
     response_dict = response.json()
     try:
         return response_dict['data']['attributes']['status']
@@ -90,7 +94,7 @@ def api_analyse_file(file_id):
         return ''
 
 
-def scan(file_path):
+def scan(file_path):    # True - вредонос, False - все окей
     hash_sha256 = get_file_hash_sha256(file_path)
     hash_ssdeep, analyse_result = api_find_file(hash_sha256)
     if hash_ssdeep == '':
@@ -99,7 +103,6 @@ def scan(file_path):
         while analyse_status != 'completed':
             time.sleep(2)
             analyse_status = api_analyse_file(file_id)
-            print('\nanalyse_status \t', analyse_status)
         hash_ssdeep, analyse_result = api_find_file(hash_sha256)
 
     check_ssdeep = scan_database(hash_ssdeep)
@@ -120,9 +123,6 @@ if __name__ == '__main__':
     file_1 = r'C:\Users\alina\Desktop\test.txt'
     file_2 = r'C:\Users\alina\Desktop\not_virus.txt'
 
-
-
     # scan(file_file)
-    scan(file_2)
-    # file_hash_sha256(file_file)
-    # print('ad44d3ae0427b355d715d000005cb6b2a7082b52b35e3912245b86c0f6fecade \t - VT')
+    # scan(file_2)
+    scan_database('3:a+JraNvsgzsVqSwHq9:tJuOgzsko')

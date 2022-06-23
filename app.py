@@ -25,8 +25,9 @@ from sqlalchemy import insert, select, update
 from config import ADMIN_EMAIL, ADMIN_PASSWORD, Config
 from database import db_session, init_db
 from models import EntriesUsers, Entry, Role, User
+from scanner.scanner import scan
 
-ALLOWED_EXTENSIONS = {'apk'}
+ALLOWED_EXTENSIONS = {'apk', 'txt'}     # TODO изменить потом
 LENGTH_FOLDER_NAME = 2
 
 SECURITY_LOGIN_USER_TEMPLATE = 'templates/security/login_user.html'
@@ -197,7 +198,7 @@ def add_entry():
 
     if request.method == 'POST':
         if 'file' not in request.files:
-            flash('Ошибка')  # TODO зачем?  No file part
+            flash('Ошибка')  # No file part
             return redirect(request.url)
 
         file = request.files['file']
@@ -218,10 +219,13 @@ def add_entry():
             user_path = os.path.join(app.config['UPLOAD_FOLDER'], filename[:LENGTH_FOLDER_NAME])
             if not os.path.exists(user_path):
                 os.mkdir(user_path)
-            file.save(os.path.join(user_path, filename))    # TODO проверить безопасность файла
-
-
-
+            abs_path = os.path.join(user_path, filename)
+            file.save(abs_path)    # TODO проверить безопасность файла
+            # print('\nabs_path \t', abs_path)
+            if scan(abs_path):
+                os.remove(abs_path)
+                flash('Файл может содержать вредоносные функции')
+                return redirect(request.url)
             text = request.form["text"]
             tmp = text + '\n'
             tagline_list = tmp[:250]

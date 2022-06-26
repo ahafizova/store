@@ -1,17 +1,13 @@
 import hashlib
 import time
 
+import androguard
 import requests
 from sqlalchemy import insert, select
 import ssdeep
-# import scanner.ssdeep as ssdeep
 
 from config import API_KEY
-from scanner.db import db_session, Hash, init_db
-# from db import db_session, Hash, init_db
-
-
-# API_KEY = 'd9da36233f2a6d367fc9c7b1389bfd02a1fcc34e1191a77782f3c43db96cf4ef'
+from scanner_db import db_session, Hash, init_db
 
 
 def creat_database():
@@ -97,14 +93,16 @@ def api_analyse_file(file_id):
 def scan(file_path):    # True - вредонос, False - все окей
     hash_sha256 = get_file_hash_sha256(file_path)
     hash_ssdeep, analyse_result = api_find_file(hash_sha256)
-    if hash_ssdeep == '':
+    print(analyse_result)
+    if analyse_result == dict():
         file_id = api_upload_file(file_path)
         analyse_status = ''
         while analyse_status != 'completed':
-            time.sleep(2)
             analyse_status = api_analyse_file(file_id)
+            time.sleep(2)
         hash_ssdeep, analyse_result = api_find_file(hash_sha256)
-
+    print('==============================================')
+    print(analyse_result)
     check_ssdeep = scan_database(hash_ssdeep)
     if check_ssdeep:
         return True
@@ -124,5 +122,7 @@ if __name__ == '__main__':
     file_2 = r'C:\Users\alina\Desktop\not_virus.txt'
 
     # scan(file_file)
+    scan(file_1)
     # scan(file_2)
-    scan_database('3:a+JraNvsgzsVqSwHq9:tJuOgzsko')
+
+    # scan_database('3:a+JraNvsgzsVqSwHq9:tJuOgzsko')

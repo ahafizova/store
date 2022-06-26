@@ -4,8 +4,6 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from config import DB_URL
 
-# DB_URL = 'postgresql://postgres:root@localhost/ssdeep'
-
 
 engine = create_engine(DB_URL)
 db_session = scoped_session(sessionmaker(autocommit=False,

@@ -6,9 +6,9 @@ import os
 
 """-------------------- models.py --------------------"""
 
-"""-------------------- scanner/scanner.py --------------------"""
+"""-------------------- scanner.py --------------------"""
 
-"""-------------------- scanner/db.py --------------------"""
+"""-------------------- scanner_db.py --------------------"""
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 DATABASE_URL = 'postgresql://postgres:root@localhost/app'

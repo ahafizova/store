@@ -25,7 +25,7 @@ from sqlalchemy import insert, select, update
 from config import ADMIN_EMAIL, ADMIN_PASSWORD, Config
 from database import db_session, init_db
 from models import EntriesUsers, Entry, Role, User
-from scanner.scanner import scan
+from scanner import scan
 
 ALLOWED_EXTENSIONS = {'apk', 'txt'}     # TODO изменить потом
 LENGTH_FOLDER_NAME = 2

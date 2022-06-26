@@ -27,7 +27,8 @@ from database import db_session, init_db
 from models import EntriesUsers, Entry, Role, User
 from scanner import scan
 
-ALLOWED_EXTENSIONS = {'apk', 'txt'}     # TODO изменить потом
+# TODO изменить потом
+ALLOWED_EXTENSIONS = {'apk', 'txt'}
 LENGTH_FOLDER_NAME = 2
 
 SECURITY_LOGIN_USER_TEMPLATE = 'templates/security/login_user.html'
@@ -167,7 +168,8 @@ def home():
     return render_template('home_user.html', email=current_user.email)
 
 
-@app.route('/dev', methods=['GET', 'POST'])     # TODO ограничить доступ по ссылке
+# TODO ограничить доступ по ссылке
+@app.route('/dev', methods=['GET', 'POST'])
 @auth_required()
 def add_dev():
     if request.method == 'POST':
@@ -198,7 +200,8 @@ def add_entry():
 
     if request.method == 'POST':
         if 'file' not in request.files:
-            flash('Ошибка')  # No file part
+            # No file part
+            flash('Ошибка')
             return redirect(request.url)
 
         file = request.files['file']
@@ -220,7 +223,8 @@ def add_entry():
             if not os.path.exists(user_path):
                 os.mkdir(user_path)
             abs_path = os.path.join(user_path, filename)
-            file.save(abs_path)    # TODO проверить безопасность файла
+            # TODO проверить безопасность файла
+            file.save(abs_path)
             # print('\nabs_path \t', abs_path)
             if scan(abs_path):
                 os.remove(abs_path)
@@ -276,7 +280,8 @@ def edit():
     return render_template('edit.html', entries=entries, email=current_user.email)
 
 
-@app.route('/edit/<app_id>')  # TODO добавить редактирование названия, описания и файла
+# TODO добавить редактирование названия, описания и файла
+@app.route('/edit/<app_id>')
 @auth_required()
 @roles_accepted('admin', 'developer')
 def edit_entry(app_id):
@@ -290,7 +295,8 @@ def edit_entry(app_id):
     return redirect(url_for('show_entries'))
 
 
-@app.route('/admin')  # TODO добавить настройки для админа
+# TODO добавить настройки для админа
+@app.route('/admin')
 @auth_required()
 @roles_required('admin')
 def admin():

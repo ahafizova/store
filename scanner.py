@@ -90,10 +90,10 @@ def api_analyse_file(file_id):
         return ''
 
 
-def scan(file_path):    # True - вредонос, False - все окей
+# True - вредонос, False - все окей
+def scan(file_path):
     hash_sha256 = get_file_hash_sha256(file_path)
     hash_ssdeep, analyse_result = api_find_file(hash_sha256)
-    print(analyse_result)
     if analyse_result == dict():
         file_id = api_upload_file(file_path)
         analyse_status = ''
@@ -101,8 +101,6 @@ def scan(file_path):    # True - вредонос, False - все окей
             analyse_status = api_analyse_file(file_id)
             time.sleep(2)
         hash_ssdeep, analyse_result = api_find_file(hash_sha256)
-    print('==============================================')
-    print(analyse_result)
     check_ssdeep = scan_database(hash_ssdeep)
     if check_ssdeep:
         return True

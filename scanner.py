@@ -7,6 +7,8 @@ import requests
 from sqlalchemy import insert, select
 import ssdeep
 
+from colorama import Fore, Style
+
 from analyse import analyse
 from config import API_KEY
 from scanner_db import db_session, Hash, init_db
@@ -20,7 +22,8 @@ def get_file_hash_sha256(file_path):
         while len(fb) > 0:
             result.update(fb)
             fb = f.read(block_size)
-    print(result.hexdigest())
+    print('Хеш SHA256:')
+    print(Fore.GREEN + result.hexdigest() + Style.RESET_ALL)
     return result.hexdigest()
 
 
@@ -66,7 +69,20 @@ def api_find_file(file_sha256, detail: bool = False):
         ssdeep_hash = response_dict['data']['attributes']['ssdeep']
         analysis_stats = response_dict['data']['attributes']['last_analysis_stats']
         if detail:
-            print(analysis_stats)
+            print('\nРезультаты анализа:')
+            for i in analysis_stats:
+                print(Fore.GREEN + i + '-' + str(analysis_stats[i]) + Style.RESET_ALL)
+
+            analysis_sandbox = response_dict['data']['attributes']['sandbox_verdicts']['Dr.Web vxCube']
+            print('\nРезультаты анализа в песочнице:')
+            print(Fore.GREEN + analysis_sandbox['sandbox_name'] + Style.RESET_ALL)
+            for i in analysis_sandbox['malware_classification']:
+                print(Fore.GREEN + i + Style.RESET_ALL)
+
+            label = response_dict['data']['attributes']['popular_threat_classification']['suggested_threat_label']
+            print('\nКлассификация угрозы:')
+            print(Fore.GREEN + label + Style.RESET_ALL)
+
         return ssdeep_hash, analysis_stats
     except KeyError:
         return ssdeep_hash, analysis_stats
@@ -144,7 +160,7 @@ if __name__ == '__main__':
     print('\n\n\n')
 
     f_1 = r'C:\Users\alina\Desktop\com.github.axet.bookreader_412.apk'
-    f_2 = r'C:\Users\alina\Desktop\eu.faircode.email_1921.apk'
+    f_2 = r'6c8de4a7836adb66fb878b1fba4f27bad96f9d4824a128c303c987569a54f9f4.apk'
 
     file_1 = r'C:\Users\alina\Desktop\test.txt'
     file_2 = r'C:\Users\alina\Desktop\not_virus.txt'
@@ -158,10 +174,11 @@ if __name__ == '__main__':
     # scan(file_1)
     # scan(file_2)
 
-    # get_file_hash_sha256(file_file)
+    tet = get_file_hash_sha256(f_2)
+    api_find_file(tet, detail=True)
 
     # scan_database(EICAR)
 
-    show_logging()
-    analyse_apk(f_1, detail=True)
-    analyse_apk(f_2, detail=True)
+    # show_logging()
+    # analyse_apk(f_1, detail=True)
+    # analyse_apk(f_2, detail=True)
